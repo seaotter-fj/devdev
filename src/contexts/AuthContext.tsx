@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
-import { toast } from 'react-hot-toast';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { Session, User } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
+import { toast } from "react-hot-toast";
 
 type AuthContextType = {
   session: Session | null;
@@ -19,6 +19,8 @@ type AuthContextType = {
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   updatePassword: (password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  redirectUrl: string | null;
+  setRedirectUrl: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,19 +30,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
 
   const checkAdminStatus = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', userId)
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", userId)
         .single();
 
       if (error) throw error;
       setIsAdmin(data?.is_admin || false);
     } catch (error) {
-      console.error('Error checking admin status:', error);
+      console.error("Error checking admin status:", error);
       setIsAdmin(false);
     }
   };
@@ -57,16 +60,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          checkAdminStatus(session.user.id);
-        }
-        setLoading(false);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        checkAdminStatus(session.user.id);
       }
-    );
+      setLoading(false);
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -79,16 +82,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
       });
-      
+
       if (error) {
         toast.error(error.message);
         return { error, data: null };
       }
-      
-      toast.success('Sign up successful! Please check your email to confirm your account.');
+
+      toast.success(
+        "Sign up successful! Please check your email to confirm your account."
+      );
+      setRedirectUrl("/all-posts");
       return { data, error: null };
     } catch (error) {
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
       return { error: error as Error, data: null };
     }
   };
@@ -99,16 +105,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
       });
-      
+
       if (error) {
         toast.error(error.message);
         return { error, data: null };
       }
-      
-      toast.success('Logged in successfully!');
+
+      toast.success("Logged in successfully!");
+      setRedirectUrl("/all-posts");
       return { data, error: null };
     } catch (error) {
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
       return { error: error as Error, data: null };
     }
   };
@@ -116,10 +123,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
-      toast.success('Logged out successfully');
+      toast.success("Logged out successfully");
     } catch (error) {
-      toast.error('Error signing out');
-      console.error('Error signing out:', error);
+      toast.error("Error signing out");
+      console.error("Error signing out:", error);
     }
   };
 
@@ -128,16 +135,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
-      
+
       if (error) {
         toast.error(error.message);
         return { error };
       }
-      
-      toast.success('Password reset instructions sent to your email');
+
+      toast.success("Password reset instructions sent to your email");
       return { error: null };
     } catch (error) {
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
       return { error: error as Error };
     }
   };
@@ -145,16 +152,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const updatePassword = async (password: string) => {
     try {
       const { error } = await supabase.auth.updateUser({ password });
-      
+
       if (error) {
         toast.error(error.message);
         return { error };
       }
-      
-      toast.success('Password updated successfully');
+
+      toast.success("Password updated successfully");
       return { error: null };
     } catch (error) {
-      toast.error('An unexpected error occurred');
+      toast.error("An unexpected error occurred");
       return { error: error as Error };
     }
   };
@@ -169,6 +176,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     resetPassword,
     updatePassword,
     signOut,
+    redirectUrl,
+    setRedirectUrl,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -177,7 +186,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

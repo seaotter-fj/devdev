@@ -1,38 +1,45 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import Button from '../components/UI/Button';
-import Input from '../components/UI/Input';
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import Button from "../components/UI/Button";
+import Input from "../components/UI/Input";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, redirectUrl, setRedirectUrl } = useAuth();
+
+  useEffect(() => {
+    if (redirectUrl) {
+      navigate(redirectUrl);
+      setRedirectUrl(null);
+    }
+  }, [redirectUrl, navigate, setRedirectUrl]);
 
   const validateForm = () => {
     const newErrors = {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     };
     let isValid = true;
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
       isValid = false;
     }
 
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
       isValid = false;
     }
 
@@ -47,10 +54,8 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const { error } = await signIn(email, password);
-      if (!error) {
-        navigate('/profile');
-      }
+      await signIn(email, password);
+      // リダイレクトはAuthContextで処理されるため、ここでは不要
     } finally {
       setLoading(false);
     }
@@ -64,8 +69,11 @@ export default function Login() {
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+            Or{" "}
+            <Link
+              to="/signup"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
               create a new account
             </Link>
           </p>
