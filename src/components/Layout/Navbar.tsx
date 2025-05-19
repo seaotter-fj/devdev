@@ -1,6 +1,6 @@
-import { LogOut, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { LogOut, User } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -11,7 +11,9 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-blue-600 font-bold text-xl">AuthApp</span>
+              <span className="text-blue-600 font-bold text-xl">
+                YourComment
+              </span>
             </Link>
           </div>
           <div className="flex items-center">

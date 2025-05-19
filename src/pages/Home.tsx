@@ -1,6 +1,6 @@
-import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
-import { LogIn, UserPlus } from 'lucide-react';
+import { useAuth } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
+import { LogIn, UserPlus } from "lucide-react";
 
 export default function Home() {
   const { user } = useAuth();
@@ -10,10 +10,10 @@ export default function Home() {
       <div className="relative bg-blue-600 pb-32">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-extrabold text-white sm:text-5xl sm:tracking-tight lg:text-6xl">
-            Supabase Auth Demo
+            YourComment
           </h1>
           <p className="mt-6 max-w-3xl text-xl text-blue-100">
-            A simple authentication app using React and Supabase for learning purposes.
+            One of the simplest platforms for sharing your thoughts.
           </p>
         </div>
       </div>
@@ -48,7 +48,9 @@ export default function Home() {
                     <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition duration-150">
                       <div className="flex flex-col items-center">
                         <UserPlus className="h-8 w-8 text-blue-500" />
-                        <h3 className="mt-2 text-lg font-medium text-gray-900">Sign Up</h3>
+                        <h3 className="mt-2 text-lg font-medium text-gray-900">
+                          Sign Up
+                        </h3>
                         <p className="mt-2 text-sm text-gray-600 text-center">
                           Create a new account to get started with our demo app.
                         </p>
@@ -65,9 +67,12 @@ export default function Home() {
                     <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition duration-150">
                       <div className="flex flex-col items-center">
                         <LogIn className="h-8 w-8 text-blue-500" />
-                        <h3 className="mt-2 text-lg font-medium text-gray-900">Sign In</h3>
+                        <h3 className="mt-2 text-lg font-medium text-gray-900">
+                          Sign In
+                        </h3>
                         <p className="mt-2 text-sm text-gray-600 text-center">
-                          Already have an account? Sign in to access your profile.
+                          Already have an account? Sign in to access your
+                          profile.
                         </p>
                         <div className="mt-4">
                           <Link
